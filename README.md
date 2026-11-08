@@ -1,6 +1,6 @@
 # Inventario Simple
 
-Aplicación web para registrar productos, consultar el inventario y editar las existencias. Pensada como proyecto académico de Integración Continua.
+Aplicación web de inventario para registrar productos, consultar las existencias, actualizar unidades y retirar productos. Pensada como proyecto académico de Integración Continua.
 
 | Componente | Responsabilidad |
 | --- | --- |
@@ -38,7 +38,7 @@ Requisitos de la prueba local: Node.js 24 y PostgreSQL 17 o posterior. Los coman
    npm start
    ```
 
-4. Abre <http://127.0.0.1:8080>. Registra un producto, cambia sus unidades y recarga la página. El cambio debe seguir visible porque se guarda en PostgreSQL.
+4. Abre <http://127.0.0.1:8080>. Registra un producto, cambia sus unidades y recarga la página. El cambio debe seguir visible porque se guarda en PostgreSQL. Luego pulsa **Eliminar**, confirma la acción y recarga para verificar que el producto salió del inventario.
 
 ## API
 
@@ -48,5 +48,18 @@ Requisitos de la prueba local: Node.js 24 y PostgreSQL 17 o posterior. Los coman
 | `GET /api/productos` | Devuelve los productos registrados. |
 | `POST /api/productos` | Registra un producto con `nombre` y `cantidad`. |
 | `PUT /api/productos/:id` | Actualiza el nombre y las unidades de un producto. |
+| `DELETE /api/productos/:id` | Retira un producto del inventario. Devuelve el identificador aunque el producto ya se haya retirado. |
 
 Puedes verificar el recorrido completo en <http://127.0.0.1:8080/api/salud>. Si los tres componentes están disponibles, la respuesta contiene `{"estado":"ok","baseDeDatos":"conectada"}`.
+
+## Prueba automatizada para integración continua
+
+Con la aplicación en ejecución y una base de datos de prueba, corre desde la raíz del repositorio:
+
+```powershell
+node --test tests/inventario.test.mjs
+```
+
+La prueba entra por el frontend, comprueba la conexión a PostgreSQL y verifica el registro, la actualización y la eliminación de un producto de prueba. También retira ese producto si una comprobación intermedia falla. Configura `INVENTARIO_URL` si el frontend escucha en otra dirección o puerto.
+
+Esta comprobación puede ejecutarse en Jenkins después de levantar los servicios. El frontend, la API y el esquema SQL tienen entradas separadas. Los archivos `package-lock.json` fijan las dependencias de Node.js y la configuración de conexión se puede inyectar mediante variables de entorno.

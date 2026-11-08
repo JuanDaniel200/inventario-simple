@@ -11,9 +11,9 @@
 <body>
   <main>
     <header class="encabezado">
-      <p class="etiqueta">Control de existencias</p>
+      <p class="etiqueta">Inventario de productos</p>
       <h1>Inventario Simple</h1>
-      <p>Registra productos y consulta cuántas unidades tienes disponibles.</p>
+      <p>Registra productos, ajusta las unidades y retira los artículos que ya no manejas.</p>
     </header>
 
     <section class="panel" aria-labelledby="titulo-formulario">
@@ -28,15 +28,27 @@
     </section>
 
     <section class="panel" aria-labelledby="titulo-inventario">
-      <h2 id="titulo-inventario">Productos</h2>
+      <h2 id="titulo-inventario" tabindex="-1">Existencias de productos</h2>
+      <dl id="resumen-inventario" class="resumen" hidden>
+        <div><dt>Productos registrados</dt><dd id="total-productos">0</dd></div>
+        <div><dt>Unidades en inventario</dt><dd id="total-unidades">0</dd></div>
+      </dl>
       <p id="estado-listado">Cargando inventario…</p>
       <table id="tabla" aria-labelledby="titulo-inventario" hidden>
         <thead>
-          <tr><th scope="col">Producto</th><th scope="col">Unidades</th><th scope="col">Acción</th></tr>
+          <tr><th scope="col">Producto</th><th scope="col">Unidades</th><th scope="col">Acciones</th></tr>
         </thead>
         <tbody id="productos"></tbody>
       </table>
     </section>
   </main>
+  <dialog id="confirmar-eliminacion" class="dialogo" aria-labelledby="titulo-eliminar" aria-describedby="detalle-eliminar">
+    <h2 id="titulo-eliminar">Eliminar producto</h2>
+    <p id="detalle-eliminar"></p>
+    <form method="dialog" class="acciones-dialogo">
+      <button class="secundario" value="cancelar" autofocus>Cancelar</button>
+      <button class="peligro" value="eliminar">Eliminar producto</button>
+    </form>
+  </dialog>
 </body>
 </html>

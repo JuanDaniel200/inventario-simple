@@ -8,10 +8,18 @@ const mensaje = document.querySelector('#mensaje');
 const tabla = document.querySelector('#tabla');
 const filas = document.querySelector('#productos');
 const estado = document.querySelector('#estado-listado');
+const resumen = document.querySelector('#resumen-inventario');
+const totalProductos = document.querySelector('#total-productos');
+const totalUnidades = document.querySelector('#total-unidades');
+const dialogo = document.querySelector('#confirmar-eliminacion');
+const detalleEliminar = document.querySelector('#detalle-eliminar');
+const tituloInventario = document.querySelector('#titulo-inventario');
+const formatoCantidad = new Intl.NumberFormat('es-CO');
 
 let productos = [];
 let idEdicion = null;
-let guardando = false;
+let productoParaEliminar = null;
+let ocupado = false;
 
 async function consultar(ruta, opciones) {
   const respuesta = await fetch(`/api/productos${ruta}`, opciones);
@@ -25,6 +33,12 @@ function mostrarMensaje(texto, error = false) {
   mensaje.classList.toggle('error', error);
 }
 
+function cambiarEstadoFormulario(operacionEnCurso) {
+  ocupado = operacionEnCurso;
+  guardar.disabled = operacionEnCurso;
+  cancelar.disabled = operacionEnCurso;
+}
+
 function restablecerFormulario() {
   idEdicion = null;
   formulario.reset();
@@ -34,6 +48,9 @@ function restablecerFormulario() {
 }
 
 function renderizar() {
+  resumen.hidden = false;
+  totalProductos.textContent = formatoCantidad.format(productos.length);
+  totalUnidades.textContent = formatoCantidad.format(productos.reduce((suma, producto) => suma + producto.cantidad, 0));
   tabla.hidden = productos.length === 0;
   estado.hidden = productos.length > 0;
   estado.textContent = 'Aún no hay productos registrados.';
@@ -49,7 +66,7 @@ function renderizar() {
     editar.textContent = 'Editar';
     editar.setAttribute('aria-label', `Editar ${producto.nombre}`);
     editar.addEventListener('click', () => {
-      if (guardando) return;
+      if (ocupado) return;
       idEdicion = producto.id;
       nombre.value = producto.nombre;
       cantidad.value = producto.cantidad;
@@ -59,7 +76,24 @@ function renderizar() {
       mostrarMensaje('');
       nombre.focus();
     });
-    fila.insertCell().append(editar);
+
+    const eliminar = document.createElement('button');
+    eliminar.type = 'button';
+    eliminar.className = 'peligro';
+    eliminar.textContent = 'Eliminar';
+    eliminar.setAttribute('aria-label', `Eliminar ${producto.nombre}`);
+    eliminar.addEventListener('click', () => {
+      if (ocupado) return;
+      productoParaEliminar = producto;
+      detalleEliminar.textContent = `¿Quieres retirar «${producto.nombre}» del inventario?`;
+      dialogo.returnValue = 'cancelar';
+      dialogo.showModal();
+    });
+
+    const acciones = document.createElement('div');
+    acciones.className = 'acciones-fila';
+    acciones.append(editar, eliminar);
+    fila.insertCell().append(acciones);
   }
 }
 
@@ -69,13 +103,32 @@ cancelar.addEventListener('click', () => {
   nombre.focus();
 });
 
+dialogo.addEventListener('close', async () => {
+  const producto = productoParaEliminar;
+  productoParaEliminar = null;
+  if (dialogo.returnValue !== 'eliminar' || !producto || ocupado) return;
+
+  cambiarEstadoFormulario(true);
+  mostrarMensaje('Eliminando…');
+  try {
+    await consultar(`/${producto.id}`, { method: 'DELETE' });
+    productos = productos.filter((actual) => actual.id !== producto.id);
+    if (idEdicion === producto.id) restablecerFormulario();
+    renderizar();
+    mostrarMensaje('Producto retirado del inventario.');
+    tituloInventario.focus();
+  } catch (error) {
+    mostrarMensaje(error.message, true);
+  } finally {
+    cambiarEstadoFormulario(false);
+  }
+});
+
 formulario.addEventListener('submit', async (evento) => {
   evento.preventDefault();
-  if (guardando) return;
+  if (ocupado) return;
 
-  guardando = true;
-  guardar.disabled = true;
-  cancelar.disabled = true;
+  cambiarEstadoFormulario(true);
   const id = idEdicion;
   mostrarMensaje('Guardando…');
   try {
@@ -92,18 +145,16 @@ formulario.addEventListener('submit', async (evento) => {
   } catch (error) {
     mostrarMensaje(error.message, true);
   } finally {
-    guardando = false;
-    guardar.disabled = false;
-    cancelar.disabled = false;
+    cambiarEstadoFormulario(false);
   }
 });
 
-guardar.disabled = true;
+cambiarEstadoFormulario(true);
 try {
   productos = await consultar('');
   renderizar();
 } catch (error) {
   estado.textContent = error.message;
 } finally {
-  guardar.disabled = false;
+  cambiarEstadoFormulario(false);
 }

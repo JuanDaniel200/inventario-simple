@@ -24,6 +24,11 @@ function leerProducto(body) {
   return { nombre, cantidad };
 }
 
+function leerId(value) {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 && id <= 2147483647 ? id : null;
+}
+
 app.get('/api/salud', async (_request, response) => {
   try {
     await pool.query('SELECT 1 FROM productos LIMIT 1');
@@ -52,9 +57,9 @@ app.post('/api/productos', async (request, response) => {
 });
 
 app.put('/api/productos/:id', async (request, response) => {
-  const id = Number(request.params.id);
+  const id = leerId(request.params.id);
   const producto = leerProducto(request.body);
-  if (!Number.isInteger(id) || id < 1 || id > 2147483647 || !producto) {
+  if (id === null || !producto) {
     return response.status(400).json({ error: 'Revisa el identificador, el nombre y la cantidad del producto.' });
   }
 
@@ -66,6 +71,16 @@ app.put('/api/productos/:id', async (request, response) => {
     return response.status(404).json({ error: 'El producto ya no está disponible.' });
   }
   response.json(rows[0]);
+});
+
+app.delete('/api/productos/:id', async (request, response) => {
+  const id = leerId(request.params.id);
+  if (id === null) {
+    return response.status(400).json({ error: 'Revisa el identificador del producto.' });
+  }
+
+  await pool.query('DELETE FROM productos WHERE id = $1', [id]);
+  response.json({ id });
 });
 
 app.use((_request, response) => response.status(404).json({ error: 'Ruta desconocida.' }));
