@@ -63,3 +63,21 @@ node --test tests/inventario.test.mjs
 La prueba entra por el frontend, comprueba la conexión a PostgreSQL y verifica el registro, la actualización y la eliminación de un producto de prueba. También retira ese producto si una comprobación intermedia falla. Configura `INVENTARIO_URL` si el frontend escucha en otra dirección o puerto.
 
 Esta comprobación puede ejecutarse en Jenkins después de levantar los servicios. El frontend, la API y el esquema SQL tienen entradas separadas. Los archivos `package-lock.json` fijan las dependencias de Node.js y la configuración de conexión se puede inyectar mediante variables de entorno.
+
+## Ejecutar con Docker Desktop
+
+En una copia nueva del repositorio, abre Docker Desktop. Desde la raíz del proyecto, crea el archivo `.env` y cambia el valor de `INVENTARIO_DB_PASSWORD` por una contraseña local.
+
+```cmd
+copy /-Y .env.example .env
+notepad .env
+```
+
+Guarda `.env` y levanta los tres servicios.
+
+```cmd
+docker compose up -d --build --wait
+docker compose ps
+```
+
+Abre http://127.0.0.1:8080 para usar el inventario.

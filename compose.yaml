@@ -1,0 +1,58 @@
+name: inventario-simple
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: inventario_simple
+      POSTGRES_USER: inventario
+      POSTGRES_PASSWORD: "${INVENTARIO_DB_PASSWORD:?Define INVENTARIO_DB_PASSWORD en .env}"
+    volumes:
+      - postgres-datos:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "inventario", "-d", "inventario_simple"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  backend:
+    image: inventario-simple-backend:1.0
+    build: ./backend
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "3000"
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: inventario
+      PGDATABASE: inventario_simple
+      PGPASSWORD: "${INVENTARIO_DB_PASSWORD:?Define INVENTARIO_DB_PASSWORD en .env}"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/salud').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+
+  frontend:
+    image: inventario-simple-frontend:1.0
+    build: ./frontend
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "8080"
+      API_URL: "http://backend:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/salud').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+
+volumes:
+  postgres-datos:
