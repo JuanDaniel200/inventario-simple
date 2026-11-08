@@ -1,0 +1,45 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #19342f;
+  background: #eef4f1;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+main { max-width: 55rem; margin: 0 auto; padding: clamp(1rem, 5vw, 3rem) 1rem; }
+
+.encabezado {
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  background: #10463a;
+  color: #fff;
+  border-radius: 1rem;
+}
+.encabezado p { margin: 0.5rem 0 0; color: #d6ebe2; }
+.encabezado .etiqueta { margin: 0; font-size: 0.9rem; font-weight: 650; }
+h1 { margin: 0.25rem 0 0; font-size: clamp(2rem, 6vw, 3rem); letter-spacing: -0.045em; }
+h2 { margin: 0 0 1rem; font-size: 1.3rem; }
+
+.panel { margin-top: 1rem; padding: 1.25rem; background: #fff; border: 1px solid #d5e5de; border-radius: 0.8rem; }
+form { display: flex; flex-wrap: wrap; align-items: end; gap: 0.75rem; }
+label { display: grid; gap: 0.35rem; font-weight: 600; }
+label:first-child { flex: 1 1 15rem; }
+label:nth-child(2) { width: 7rem; }
+input, button { font: inherit; border-radius: 0.45rem; min-height: 2.65rem; }
+input { width: 100%; border: 1px solid #8da69d; color: inherit; padding: 0.5rem 0.65rem; }
+button { border: 1px solid transparent; background: #17634f; color: #fff; font-weight: 650; padding: 0.5rem 0.9rem; cursor: pointer; }
+button.secundario { border-color: #a7c7bb; background: #edf6f2; color: #174a3d; }
+button:hover:not(:disabled) { filter: brightness(0.92); }
+button:disabled { opacity: 0.65; cursor: wait; }
+button:focus-visible, input:focus-visible { outline: 3px solid #168a71; outline-offset: 2px; }
+
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th, td { padding: 0.65rem 0.25rem; text-align: left; border-bottom: 1px solid #e0ece7; overflow-wrap: anywhere; }
+th:nth-child(2), td:nth-child(2) { width: 5.5rem; text-align: right; font-variant-numeric: tabular-nums; }
+th:last-child, td:last-child { width: 5.3rem; text-align: right; }
+tbody tr:last-child td { border-bottom: 0; }
+#estado-listado { color: #42655b; }
+#mensaje:empty { display: none; }
+#mensaje { margin: 0.85rem 0 0; color: #135746; }
+#mensaje.error { color: #a12d26; }

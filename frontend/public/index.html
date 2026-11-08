@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inventario Simple</title>
+  <link rel="icon" href="/inventario.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/inventario.js"></script>
+</head>
+<body>
+  <main>
+    <header class="encabezado">
+      <p class="etiqueta">Control de existencias</p>
+      <h1>Inventario Simple</h1>
+      <p>Registra productos y consulta cuántas unidades tienes disponibles.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="titulo-formulario">
+      <h2 id="titulo-formulario">Registrar producto</h2>
+      <form id="formulario">
+        <label>Producto <input id="nombre" name="nombre" required maxlength="80" placeholder="Ej. Cuaderno" autocomplete="off"></label>
+        <label>Unidades <input id="cantidad" name="cantidad" type="number" required min="0" max="999999" step="1" value="1"></label>
+        <button id="guardar" type="submit" disabled>Guardar</button>
+        <button id="cancelar" class="secundario" type="button" hidden>Cancelar</button>
+      </form>
+      <p id="mensaje" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="titulo-inventario">
+      <h2 id="titulo-inventario">Productos</h2>
+      <p id="estado-listado">Cargando inventario…</p>
+      <table id="tabla" aria-labelledby="titulo-inventario" hidden>
+        <thead>
+          <tr><th scope="col">Producto</th><th scope="col">Unidades</th><th scope="col">Acción</th></tr>
+        </thead>
+        <tbody id="productos"></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
