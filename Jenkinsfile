@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         INVENTARIO_DB_PASSWORD = 'ClaveTemporalJenkins123'
-        INVENTARIO_URL = 'http://docker.internal'
+        INVENTARIO_URL = 'http://frontend:8080'
     }
 
     stages {
@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sh '''
                     docker run --rm \
-                      --add-host=host.docker.internal:host-gateway \
+                      --network inventario-simple_default \
                       -e INVENTARIO_URL=${INVENTARIO_URL} \
                       --volumes-from jenkins \
                       -w "$PWD" \
