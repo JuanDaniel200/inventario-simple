@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh '''
                     docker compose up -d --build --wait db
-                    docker compose exec -T db psql -U postgres -d inventario_simple < database/schema.sql
+                    docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < database/schema.sql
                     docker compose up -d --wait
                 '''
             }
