@@ -19,8 +19,7 @@ pipeline {
         stage('Construir y levantar servicios') {
             steps {
                 sh '''
-                    docker compose up -d --build db
-                    sleep 5
+                    docker compose up -d --build --wait db
                     docker compose exec -T db psql -U postgres -d inventario_simple < database/schema.sql
                     docker compose up -d --wait
                 '''
